@@ -1,9 +1,11 @@
-import React from 'react';
+import './AutoCompleteTextField.css';
+
+import getInputSelection, { setCaretPosition } from 'get-input-selection';
+
 import PropTypes from 'prop-types';
+import React from 'react';
 import { findDOMNode } from 'react-dom';
 import getCaretCoordinates from 'textarea-caret';
-import getInputSelection, { setCaretPosition } from 'get-input-selection';
-import './AutoCompleteTextField.css';
 
 const KEY_UP = 38;
 const KEY_DOWN = 40;
@@ -75,6 +77,7 @@ class AutocompleteTextField extends React.Component {
     this.updateHelper = this.updateHelper.bind(this);
     this.resetHelper = this.resetHelper.bind(this);
     this.renderAutocompleteList = this.renderAutocompleteList.bind(this);
+    this.onBlur = this.onBlur.bind(this);
 
     this.state = {
       helperVisible: false,
@@ -402,12 +405,16 @@ class AutocompleteTextField extends React.Component {
     );
   }
 
+  onBlur() {
+    this.setState(prevState => ({ ...prevState, helperVisible: false }));
+    if (this.props.onBlur) this.props.onBlur();
+  }
+
   render() {
     const {
       Component,
       defaultValue,
       disabled,
-      onBlur,
       value,
       ...rest
     } = this.props;
@@ -431,7 +438,7 @@ class AutocompleteTextField extends React.Component {
       <span>
         <Component
           disabled={disabled}
-          onBlur={onBlur}
+          onBlur={this.onBlur}
           onChange={this.handleChange}
           onKeyDown={this.handleKeyDown}
           ref={(c) => { this.refInput = c; }}
